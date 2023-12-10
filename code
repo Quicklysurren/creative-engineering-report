@@ -1,0 +1,54 @@
+아두이노 소스코드
+void setup() {
+  Serial.begin(9600);
+  pinMode(2,OUTPUT);
+  pinMode(3,OUTPUT);
+}
+void loop() {
+  int a = analogRead(A0);
+  Serial.println(a);
+  if (a <= 250 ){
+    tone(9,880,500);
+    digitalWrite(2,HIGH);  // 파란색 led
+    delay(500);
+    digitalWrite(2,LOW);
+    tone(9,587,500);
+    digitalWrite(3,HIGH);  // 빨간색 led
+    delay(500);
+    digitalWrite(3,LOW);
+  }
+  else{
+    delay(500);
+  }
+}
+
+프로세싱 소스코드
+import processing.serial.*;
+import processing.net.*;
+Serial p;
+Server s;
+Client c;
+void setup(){
+  p = new Serial(this, "COM3", 9600);
+  s = new Server(this, 12345);
+}
+String m="";
+void draw(){
+ 
+  if(p.available()>0){
+    m = p.readStringUntil('\n');
+    if(m!=null){
+      print(m);
+    }
+  }
+  c = s.available();
+  if(c!=null){
+    String w = c.readString();
+    println(w);
+    if (w.indexOf("GET")==0) { // 스마트폰의 GET이 0.5초 마다 요청을 할 경우
+      c.write("HTTP/1.1 200 OK\r\n\r\n\r\n"); // POST 규격
+      c.write("밤길 운전 서행하세요.");
+    }
+     c.stop();
+  }
+}
